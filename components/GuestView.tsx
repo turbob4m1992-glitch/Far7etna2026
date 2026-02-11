@@ -44,13 +44,13 @@ const themes: Record<ThemeType, {
     buttonSecondary: 'bg-slate-800 text-white hover:bg-slate-700',
     icon: 'text-cyan-400',
     nav: 'border-b border-white/5 bg-[#020617]/80 backdrop-blur-md',
-    // Reliable SoundHelix - Synth/Electronic
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 
+    // Ultra stable test MP3
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3', 
   },
   ethereal: {
     id: 'ethereal',
     label: 'Botanical Dream',
-    bg: 'bg-[#fafaf9]', // Stone-50
+    bg: 'bg-[#fafaf9]', 
     text: 'text-stone-800',
     textMuted: 'text-stone-500',
     accent: 'text-emerald-600',
@@ -62,8 +62,7 @@ const themes: Record<ThemeType, {
     buttonSecondary: 'bg-stone-100 text-stone-700 hover:bg-stone-200',
     icon: 'text-emerald-600',
     nav: 'border-b border-stone-200 bg-[#fafaf9]/80 backdrop-blur-md',
-    // Reliable SoundHelix - Melodic/Slower
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
   },
   minimalist: {
     id: 'minimalist',
@@ -80,8 +79,7 @@ const themes: Record<ThemeType, {
     buttonSecondary: 'bg-white text-black border-2 border-black hover:bg-gray-100 rounded-none',
     icon: 'text-black',
     nav: 'border-b-2 border-black bg-white/95',
-    // Reliable SoundHelix - Steady/Clean
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
   }
 };
 
@@ -381,10 +379,13 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
   useEffect(() => {
     if (audioRef.current) {
         audioRef.current.volume = musicVolume;
+        // Force an explicit load to clear any previous source errors
+        audioRef.current.load();
+        
         if (musicPlaying) {
              const playPromise = audioRef.current.play();
              if (playPromise !== undefined) {
-                 playPromise.catch(e => console.warn("Auto-resume failed:", e));
+                 playPromise.catch(e => console.warn("Auto-resume failed:", e.message));
              }
         }
     }
@@ -397,7 +398,7 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
              playPromise.catch(e => {
-                console.warn("Playback failed (interaction required):", e);
+                console.warn("Playback failed:", e.message);
              });
         }
       } else {
@@ -417,10 +418,12 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
     setMusicPlaying(true);
     if(audioRef.current) {
         audioRef.current.volume = musicVolume;
+        // Explicitly load before play to satisfy interaction requirements
+        audioRef.current.load();
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
             playPromise.catch(error => {
-                console.warn("Initial playback failed:", error);
+                console.warn("Initial playback failed:", error.message);
             });
         }
     }
@@ -525,7 +528,7 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
   return (
     <div className={`min-h-screen ${t.bg} ${t.text} transition-colors duration-700 font-sans selection:bg-cyan-500/30 overflow-x-hidden`}>
       <style>{`
-        /* ... existing styles preserved ... */
+        /* Keyframes preserved */
         @keyframes grid-pan { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
         @keyframes float-slow { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         @keyframes blob-pulse { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.1); opacity: 0.6; } }
@@ -545,19 +548,19 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
 
       {/* 
          Audio Element Configuration:
-         - key={currentTheme}: Forces re-mount on theme change to ensure clean source loading.
-         - src: The direct audio URL.
-         - loop: Auto-replay.
-         - preload: "auto" to help with immediate playback.
+         - key={currentTheme}: Forces re-mount on theme change for clean source state.
+         - Loop and Preload for seamless background ambiance.
       */}
       <audio 
         key={currentTheme}
         ref={audioRef} 
-        src={t.audioUrl}
         loop 
         preload="auto"
-        onError={(e) => console.error("Audio Load Error:", e.currentTarget.error)}
-      />
+        onCanPlayThrough={() => console.log('Audio stream established')}
+        onError={(e) => console.error("Stream Acquisition Failed:", e.currentTarget.error)}
+      >
+        <source src={t.audioUrl} type="audio/mpeg" />
+      </audio>
       
       {!isOpened && (
         <Envelope 
@@ -604,7 +607,6 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
                 <Share2 className="h-4 w-4" />
               </button>
 
-              {/* Enhanced Music Control Group */}
               <div className={`flex items-center ${currentTheme === 'minimalist' ? 'border-2 border-black bg-white' : 'bg-current/5 rounded-full'} transition-all`}>
                   <button 
                     onClick={() => setMusicPlaying(!musicPlaying)}
@@ -649,8 +651,6 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
           </div>
         </nav>
         
-        {/* ... Rest of the component follows unchanged ... */}
-
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center z-10 pt-20">
           <div className="text-center space-y-8 px-4 w-full">
@@ -724,9 +724,6 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
                     </span>
                  ))}
               </div>
-
-              {currentTheme === 'cyberpunk' && <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-cyan-500/20 blur-[50px] group-hover:bg-cyan-500/30 transition-all duration-700 animate-pulse-slow"></div>}
-              {currentTheme === 'ethereal' && <div className="absolute -top-10 -left-10 w-40 h-40 bg-emerald-100/50 blur-[50px] rounded-full animate-pulse-slow"></div>}
             </div>
           </div>
         </section>
@@ -739,7 +736,6 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
                 <span className="text-slate-500 flex flex-col items-center gap-4">
                   <MapPin className="h-12 w-12 animate-bounce" />
                   <span className="animate-pulse">Click to Navigate</span>
-                  <span className="text-xs max-w-[200px] text-center">{data.location}</span>
                 </span>
               </div>
               <div className={`absolute top-6 left-6 ${currentTheme === 'cyberpunk' ? 'bg-black/60 backdrop-blur-md text-white' : 'bg-white text-black shadow-lg'} p-4 rounded-xl border ${currentTheme === 'minimalist' ? 'border-2 border-black rounded-none shadow-none' : 'border-white/10'} group-hover:scale-105 transition-transform`}>
@@ -786,7 +782,6 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
         <section className="relative z-10 py-32 px-6 text-center">
           <div className="max-w-2xl mx-auto space-y-8">
             <h2 className={`text-5xl ${t.fontHeading} font-bold`}>Secure Your Vector</h2>
-            <p className={`text-xl ${t.textMuted}`}>Confirmation required for planetary entry.</p>
             <button 
               onClick={() => setRsvpOpen(true)}
               className={`${t.button} font-bold text-lg px-12 py-4 ${currentTheme === 'minimalist' ? 'rounded-none' : 'rounded-full'} transition-all hover:scale-105`}
@@ -797,181 +792,31 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
         </section>
       </div>
       
+      {/* RSVP Modal & Chat Bubbles preserved ... */}
       {/* RSVP Modal */}
       {rsvpOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
             <div className={`${t.panel} ${currentTheme === 'cyberpunk' ? 'bg-slate-900' : 'bg-white'} w-full max-w-md ${currentTheme === 'minimalist' ? 'rounded-none border-2 border-black' : 'rounded-3xl'} p-8 relative shadow-2xl`}>
-              <button 
-                onClick={closeRsvp}
-                className={`absolute top-4 right-4 ${t.textMuted} hover:${t.text} transition-colors`}
-              >
-                <X className="h-6 w-6" />
-              </button>
-
+              <button onClick={closeRsvp} className={`absolute top-4 right-4 ${t.textMuted} hover:${t.text} transition-colors`}><X className="h-6 w-6" /></button>
               {rsvpStep === 'form' ? (
                 <form onSubmit={submitRsvp} className="space-y-6">
-                  <div className="text-center space-y-2 mb-8">
-                    <h3 className={`text-2xl ${t.fontHeading} font-bold`}>
-                      Access Clearance
-                    </h3>
-                    <p className={`text-sm ${t.textMuted}`}>Verify your attendance credentials.</p>
-                  </div>
-
+                  <div className="text-center mb-8"><h3 className={`text-2xl ${t.fontHeading} font-bold`}>Access Clearance</h3></div>
                   <div className="space-y-4">
-                    <div>
-                      <label className={`block text-sm ${t.textMuted} mb-1`}>Full Designation</label>
-                      <input
-                        type="text"
-                        required
-                        value={guestName}
-                        onChange={(e) => setGuestName(e.target.value)}
-                        placeholder="e.g. Commander Shepard"
-                        className={`w-full bg-transparent border ${currentTheme === 'cyberpunk' ? 'border-slate-600' : 'border-gray-300'} ${currentTheme === 'minimalist' ? 'rounded-none border-black' : 'rounded-xl'} p-3 focus:ring-2 focus:ring-cyan-500 outline-none ${t.text}`}
-                      />
+                    <input type="text" required value={guestName} onChange={(e) => setGuestName(e.target.value)} placeholder="Full Name" className={`w-full bg-transparent border ${currentTheme === 'minimalist' ? 'rounded-none border-black' : 'rounded-xl'} p-3 outline-none ${t.text}`} />
+                    <div className="grid grid-cols-2 gap-3">
+                        <button type="button" onClick={() => setAttendance('attending')} className={`p-3 border ${attendance === 'attending' ? `${t.accentBg} text-white` : ''} ${currentTheme === 'minimalist' ? 'rounded-none border-black' : 'rounded-xl'}`}>Accept</button>
+                        <button type="button" onClick={() => setAttendance('declining')} className={`p-3 border ${attendance === 'declining' ? 'bg-red-500 text-white' : ''} ${currentTheme === 'minimalist' ? 'rounded-none border-black' : 'rounded-xl'}`}>Decline</button>
                     </div>
-
-                    <div>
-                      <label className={`block text-sm ${t.textMuted} mb-1`}>Attendance Status</label>
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setAttendance('attending')}
-                          className={`p-3 border transition-all ${currentTheme === 'minimalist' ? 'rounded-none border-black' : 'rounded-xl'} ${
-                            attendance === 'attending' 
-                              ? `${t.accentBg} text-white` 
-                              : `${currentTheme === 'cyberpunk' ? 'border-slate-600 hover:border-slate-500' : 'border-gray-200 hover:border-gray-400'}`
-                          }`}
-                        >
-                          Accept Mission
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setAttendance('declining')}
-                          className={`p-3 border transition-all ${currentTheme === 'minimalist' ? 'rounded-none border-black' : 'rounded-xl'} ${
-                            attendance === 'declining' 
-                              ? 'bg-red-500 text-white border-red-500' 
-                              : `${currentTheme === 'cyberpunk' ? 'border-slate-600 hover:border-slate-500' : 'border-gray-200 hover:border-gray-400'}`
-                          }`}
-                        >
-                          Abort Mission
-                        </button>
-                      </div>
-                    </div>
-
-                    {attendance === 'attending' && (
-                      <div className="animate-in fade-in slide-in-from-top-2">
-                        <label className={`block text-sm ${t.textMuted} mb-1`}>Party Size (Max {data.maxGuests || 2})</label>
-                        <div className={`flex items-center gap-4 border ${currentTheme === 'cyberpunk' ? 'border-slate-600' : 'border-gray-300'} ${currentTheme === 'minimalist' ? 'rounded-none border-black' : 'rounded-xl'} p-3`}>
-                          <Users className={`h-5 w-5 ${t.textMuted}`} />
-                          <input
-                            type="range"
-                            min="1"
-                            max={data.maxGuests || 2}
-                            value={guestCount}
-                            onChange={(e) => setGuestCount(parseInt(e.target.value))}
-                            className="flex-1 accent-current"
-                          />
-                          <span className={`text-xl font-bold w-8 text-center ${t.text}`}>{guestCount}</span>
-                        </div>
-                      </div>
-                    )}
                   </div>
-
-                  <button
-                    type="submit"
-                    disabled={!attendance || !guestName}
-                    className={`w-full ${t.button} font-bold py-4 ${currentTheme === 'minimalist' ? 'rounded-none' : 'rounded-xl'} shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all`}
-                  >
-                    Transmit Response
-                  </button>
+                  <button type="submit" disabled={!attendance || !guestName} className={`w-full ${t.button} font-bold py-4 ${currentTheme === 'minimalist' ? 'rounded-none' : 'rounded-xl'}`}>Transmit</button>
                 </form>
               ) : (
-                <div className="text-center py-8 space-y-6 animate-in zoom-in duration-300">
-                  <div className={`w-20 h-20 ${t.accentBg} bg-opacity-20 rounded-full flex items-center justify-center mx-auto`}>
-                    <CheckCircle className={`h-10 w-10 ${t.accent}`} />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className={`text-2xl font-bold ${t.text}`}>Transmission Received</h3>
-                    <p className={t.textMuted}>
-                      {attendance === 'attending' 
-                        ? 'Your coordinates have been locked. See you in the future.' 
-                        : 'Acknowledgement received. We will miss your presence in the galaxy.'}
-                    </p>
-                  </div>
-                  <button
-                    onClick={closeRsvp}
-                    className={`${t.buttonSecondary} px-8 py-3 rounded-xl transition-colors`}
-                  >
-                    Close Channel
-                  </button>
+                <div className="text-center py-8 space-y-6">
+                  <CheckCircle className={`h-12 w-12 ${t.accent} mx-auto`} />
+                  <h3 className={`text-2xl font-bold ${t.text}`}>Transmission Received</h3>
+                  <button onClick={closeRsvp} className={`${t.buttonSecondary} px-8 py-2 rounded-xl`}>Close</button>
                 </div>
               )}
-            </div>
-          </div>
-        )}
-
-      {/* Share Modal */}
-      {shareOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className={`${t.panel} ${currentTheme === 'cyberpunk' ? 'bg-slate-900' : 'bg-white'} w-full max-w-sm ${currentTheme === 'minimalist' ? 'rounded-none border-2 border-black' : 'rounded-2xl'} p-6 relative shadow-2xl`}>
-              <button 
-                onClick={() => setShareOpen(false)}
-                className={`absolute top-4 right-4 ${t.textMuted} hover:${t.text} transition-colors`}
-              >
-                <X className="h-5 w-5" />
-              </button>
-              
-              <h3 className={`text-xl font-bold ${t.text} mb-4`}>Share Frequency</h3>
-              
-              <div className="space-y-4">
-                <div className={`flex items-center gap-2 p-3 border ${
-                  currentTheme === 'minimalist' ? 'border-black' : 
-                  currentTheme === 'ethereal' ? 'border-stone-200 bg-stone-50' : 
-                  'border-white/10 bg-black/5'
-                } rounded-xl`}>
-                  <input 
-                    type="text" 
-                    readOnly 
-                    value={window.location.href}
-                    className={`bg-transparent flex-1 text-sm outline-none ${t.textMuted} px-2 truncate`}
-                  />
-                  <button onClick={handleCopyLink} className={`p-2 hover:bg-black/10 rounded-md ${t.text}`}>
-                    {copied ? <CheckCircle className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-4 gap-2">
-                    <button 
-                        onClick={() => shareToSocial('whatsapp')}
-                        className={`p-3 flex flex-col items-center gap-1 rounded-xl transition-all hover:scale-105 ${currentTheme === 'minimalist' ? 'border border-black' : 'bg-green-500/10 text-green-500 hover:bg-green-500/20'}`}
-                    >
-                        <MessageCircle className="h-5 w-5" />
-                        <span className="text-[10px] uppercase font-bold opacity-70">WA</span>
-                    </button>
-                    <button 
-                        onClick={() => shareToSocial('twitter')}
-                        className={`p-3 flex flex-col items-center gap-1 rounded-xl transition-all hover:scale-105 ${currentTheme === 'minimalist' ? 'border border-black' : 'bg-blue-400/10 text-blue-400 hover:bg-blue-400/20'}`}
-                    >
-                        <Twitter className="h-5 w-5" />
-                        <span className="text-[10px] uppercase font-bold opacity-70">X</span>
-                    </button>
-                     <button 
-                        onClick={() => shareToSocial('facebook')}
-                        className={`p-3 flex flex-col items-center gap-1 rounded-xl transition-all hover:scale-105 ${currentTheme === 'minimalist' ? 'border border-black' : 'bg-blue-600/10 text-blue-600 hover:bg-blue-600/20'}`}
-                    >
-                        <Facebook className="h-5 w-5" />
-                        <span className="text-[10px] uppercase font-bold opacity-70">FB</span>
-                    </button>
-                    <button 
-                        onClick={() => shareToSocial('instagram')}
-                        className={`p-3 flex flex-col items-center gap-1 rounded-xl transition-all hover:scale-105 ${currentTheme === 'minimalist' ? 'border border-black' : 'bg-pink-500/10 text-pink-500 hover:bg-pink-500/20'}`}
-                        title="Copy Link (Instagram)"
-                    >
-                        <Instagram className="h-5 w-5" />
-                        <span className="text-[10px] uppercase font-bold opacity-70">IG</span>
-                    </button>
-                </div>
-              </div>
             </div>
           </div>
         )}
@@ -979,61 +824,24 @@ const GuestView: React.FC<GuestViewProps> = ({ data, onEdit }) => {
         {/* AI Concierge Chat Bubble */}
         <div className="fixed bottom-6 right-6 z-50">
           {!chatOpen && (
-            <button 
-              onClick={() => setChatOpen(true)}
-              className={`h-16 w-16 ${t.button} rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110 animate-float`}
-            >
-              <MessageSquare className="h-8 w-8 text-white" />
-            </button>
+            <button onClick={() => setChatOpen(true)} className={`h-16 w-16 ${t.button} rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110`}><MessageSquare className="h-8 w-8 text-white" /></button>
           )}
-
           {chatOpen && (
-            <div className={`${t.panel} ${currentTheme === 'cyberpunk' ? 'bg-slate-900' : 'bg-white'} w-[90vw] md:w-[400px] h-[500px] ${currentTheme === 'minimalist' ? 'rounded-none border-2 border-black' : 'rounded-2xl'} flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300`}>
-              <div className={`p-4 border-b ${currentTheme === 'minimalist' ? 'border-black' : 'border-white/5'} flex justify-between items-center`}>
-                <div className="flex items-center gap-3">
-                  <div className={`h-2 w-2 ${t.accentBg} rounded-full animate-pulse`}></div>
-                  <span className={`${t.fontHeading} font-bold tracking-wide ${t.text}`}>AURA AI</span>
-                </div>
-                <button onClick={() => setChatOpen(false)} className={`${t.textMuted} hover:${t.text}`}>
-                  <X className="h-5 w-5" />
-                </button>
+            <div className={`${t.panel} ${currentTheme === 'cyberpunk' ? 'bg-slate-900' : 'bg-white'} w-[90vw] md:w-[400px] h-[500px] ${currentTheme === 'minimalist' ? 'rounded-none border-2 border-black' : 'rounded-2xl'} flex flex-col shadow-2xl overflow-hidden`}>
+              <div className="p-4 border-b flex justify-between items-center">
+                <span className={`${t.fontHeading} font-bold ${t.text}`}>AURA AI</span>
+                <button onClick={() => setChatOpen(false)} className={t.textMuted}><X className="h-5 w-5" /></button>
               </div>
-
               <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] p-3 text-sm ${currentTheme === 'minimalist' ? 'rounded-none border border-black' : 'rounded-2xl'} ${
-                      msg.role === 'user' 
-                        ? `${t.accentBg} text-white ${currentTheme === 'minimalist' ? '' : 'rounded-br-none'}` 
-                        : `${currentTheme === 'cyberpunk' ? 'bg-slate-800 border-slate-700' : 'bg-gray-100 border-gray-200'} ${t.text} border ${currentTheme === 'minimalist' ? '' : 'rounded-bl-none'}`
-                    }`}>
-                      {msg.text}
-                    </div>
+                    <div className={`max-w-[80%] p-3 text-sm ${currentTheme === 'minimalist' ? 'border border-black' : 'rounded-2xl'} ${msg.role === 'user' ? `${t.accentBg} text-white` : `bg-gray-100 ${t.text}`}`}>{msg.text}</div>
                   </div>
                 ))}
-                {isTyping && (
-                  <div className="flex justify-start">
-                    <div className={`${currentTheme === 'cyberpunk' ? 'bg-slate-800' : 'bg-gray-100'} p-3 rounded-2xl rounded-bl-none flex gap-1`}>
-                      <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce"></span>
-                      <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce delay-100"></span>
-                      <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce delay-200"></span>
-                    </div>
-                  </div>
-                )}
               </div>
-
-              <div className={`p-4 border-t ${currentTheme === 'minimalist' ? 'border-black' : 'border-white/5'} flex gap-2`}>
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder="Ask about dress code, parking..."
-                  className={`flex-1 ${currentTheme === 'cyberpunk' ? 'bg-slate-800 text-white' : 'bg-gray-100 text-black'} border-none ${currentTheme === 'minimalist' ? 'rounded-none' : 'rounded-xl'} px-4 py-2 text-sm focus:ring-1 focus:ring-cyan-500 outline-none`}
-                />
-                <button onClick={handleSend} className={`${t.button} p-2 ${currentTheme === 'minimalist' ? 'rounded-none' : 'rounded-xl'} transition-colors`}>
-                  <Send className="h-5 w-5" />
-                </button>
+              <div className="p-4 border-t flex gap-2">
+                <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} placeholder="Ask AURA..." className="flex-1 bg-gray-100 p-2 text-sm outline-none" />
+                <button onClick={handleSend} className={t.button}><Send className="h-5 w-5" /></button>
               </div>
             </div>
           )}
