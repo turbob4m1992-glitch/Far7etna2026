@@ -1,0 +1,7 @@
+{
+  "name": "Vow.AI - Futuristic Wedding Suite",
+  "description": "An interactive, AI-powered wedding invitation builder and viewer featuring a holographic design, smart concierge chat, and dynamic storytelling.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
