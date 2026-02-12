@@ -1,6 +1,6 @@
 {
-  "name": "Vow.AI - Futuristic Wedding Suite",
-  "description": "An interactive, AI-powered wedding invitation builder and viewer featuring a holographic design, smart concierge chat, and dynamic storytelling.",
+  "name": "The Eternal Vow - Royal Wedding Suite",
+  "description": "An interactive, AI-powered holographic wedding experience. Join us as we merge our paths into the digital sunset.",
   "requestFramePermissions": [
     "geolocation"
   ]

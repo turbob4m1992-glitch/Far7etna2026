@@ -3,31 +3,43 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vow.AI - Futuristic Wedding Suite</title>
+    <title>The Eternal Vow - Our Royal Wedding 2026</title>
+    
+    <!-- Ensures all assets load relative to the current folder -->
+    <base href="./">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Babel Standalone: This allows the browser to transpile .tsx files in real-time -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
     <script>
-      // 1. Shim process.env immediately to prevent ReferenceErrors in modules
+      // 1. Shim process.env immediately to prevent ReferenceErrors
       window.process = { env: { API_KEY: '' } };
 
       // 2. Comprehensive error tracker
-      window.onerror = function(message, source, lineno, colno, error) {
-        console.error("BOOT_CRASH:", { message, source, lineno, colno, error });
+      function showError(msg, details = "") {
+        console.error("FATAL_ERROR:", msg, details);
         const root = document.getElementById('root');
         if (root) {
           root.innerHTML = `
             <div style="padding:40px; color:#ff4444; font-family:monospace; background:#020617; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
               <h2 style="font-family:Orbitron; color:#06b6d4; margin-bottom:20px;">SYSTEM BOOT FAILURE</h2>
               <div style="border:1px solid #333; padding:20px; background:#0f172a; border-radius:8px; max-width:600px; width:100%;">
-                <p style="margin:0 0 10px 0; color:#ef4444;">${message}</p>
-                <p style="font-size:12px; opacity:0.5; margin:0;">Source: ${source || 'unknown'}:${lineno || '?'}</p>
-                <p style="font-size:11px; margin-top:20px; color:#06b6d4;">Check the browser console for more details.</p>
+                <p style="margin:0 0 10px 0; color:#ef4444;">${msg}</p>
+                ${details ? `<p style="font-size:12px; opacity:0.5; margin:0;">${details}</p>` : ''}
+                <p style="font-size:11px; margin-top:20px; color:#06b6d4;">Browsers cannot run .tsx files natively. We are using a client-side transpiler to bypass MIME type restrictions on GitHub Pages.</p>
               </div>
-              <button onclick="location.reload()" style="margin-top:30px; padding:10px 20px; background:#06b6d4; color:black; border:none; cursor:pointer; font-family:Orbitron;">RETRY INITIALIZATION</button>
+              <button onclick="location.reload()" style="margin-top:30px; padding:10px 20px; background:#06b6d4; color:black; border:none; cursor:pointer; font-family:Orbitron; border-radius:4px;">RETRY INITIALIZATION</button>
             </div>`;
         }
+      }
+
+      window.onerror = function(message, source, lineno, colno, error) {
+        showError(message, `Source: ${source || 'unknown'}:${lineno || '?'}`);
       };
-      
+
       tailwind.config = {
         theme: {
           extend: {
@@ -53,7 +65,7 @@
     <style>
       body { background-color: #020617; color: #fff; margin: 0; overflow-x: hidden; }
       #root:empty::before {
-        content: 'BOOTING AI WEDDING SUITE...';
+        content: 'THE ETERNAL VOW 2026 INITIALIZING...';
         position: fixed;
         top: 50%;
         left: 50%;
@@ -66,22 +78,36 @@
       }
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
     </style>
+    
     <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@19.2.4",
-    "react-dom": "https://esm.sh/react-dom@19.2.4",
-    "react-dom/client": "https://esm.sh/react-dom@19.2.4/client",
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
     "@google/genai": "https://esm.sh/@google/genai@1.40.0",
     "lucide-react": "https://esm.sh/lucide-react@0.463.0?external=react,react-dom",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/"
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.4"
   }
 }
 </script>
 </head>
 <body>
     <div id="root"></div>
-    <script type="module" src="./index.tsx" crossorigin></script>
+    
+    <!-- 
+      By using type="text/babel" and data-type="module", Babel Standalone 
+      will fetch the .tsx file, transpile it into JavaScript, and execute 
+      it as a module. This completely bypasses the GitHub Pages MIME type error.
+    -->
+    <script 
+      type="text/babel" 
+      data-type="module" 
+      data-presets="react,typescript" 
+      src="./index.tsx"
+    ></script>
 </body>
 </html>

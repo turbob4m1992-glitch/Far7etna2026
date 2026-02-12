@@ -4,26 +4,26 @@ import GuestView from './components/GuestView.tsx';
 import { InvitationData, AppMode } from './types.ts';
 
 const initialData: InvitationData = {
-  partner1: "Alex",
-  partner2: "Jordan",
-  date: "2025-10-24",
-  location: "Neo-Tokyo Skyline Gardens",
-  venueName: "The Celestial Deck",
-  storyPoints: "We met at a robotics hackathon. Our first date was watching a meteor shower.",
-  storyNarrative: "In the neon glow of a digital frontier, Alex and Jordan's code intertwined. Sparks flew not from circuits, but from souls.",
+  partner1: "Omar",
+  partner2: "Laila",
+  date: "2026-06-15",
+  location: "Cairo Opera House - Grand Ballroom",
+  venueName: "The Royal Pavilion",
+  storyPoints: "We met under the stars of the Nile. Our first journey was a desert sunrise.",
+  storyNarrative: "Across dunes of time and rivers of fate, Omar and Laila's paths merged into a single horizon. A love that echoes in the sands of eternity.",
   themeColor: "cyan",
   theme: 'cyberpunk',
   maxGuests: 2,
   stats: {
-    daysTogether: 1240,
-    milesTraveled: 45000,
-    coffeesShared: 892,
+    daysTogether: 1500,
+    milesTraveled: 12000,
+    coffeesShared: 2400,
   },
   schedule: [
-    { time: "16:00", event: "Arrival & Cocktails", description: "Check in at the bio-scanner.", icon: "cocktail" },
-    { time: "17:30", event: "Ceremony", description: "Exchange of quantum vows.", icon: "heart" },
-    { time: "19:00", event: "Galactic Feast", description: "Fusion cuisine.", icon: "utensils" },
-    { time: "21:00", event: "Dance Protocol", description: "Hit the floor.", icon: "music" },
+    { time: "18:00", event: "Welcome Reception", description: "Arrival of guests at the main gate.", icon: "cocktail" },
+    { time: "19:30", event: "Zaffa & Ceremony", description: "Traditional entrance and vows.", icon: "heart" },
+    { time: "21:00", event: "Gala Dinner", description: "Royal banquet served.", icon: "utensils" },
+    { time: "23:00", event: "Celestial Celebration", description: "Dancing under the moonlight.", icon: "music" },
   ]
 };
 
