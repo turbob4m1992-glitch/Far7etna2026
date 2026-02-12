@@ -3,43 +3,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Eternal Vow - Our Royal Wedding 2026</title>
+    <title>Vow.AI - The Eternal Vow 2026</title>
     
-    <!-- Ensures all assets load relative to the current folder -->
-    <base href="./">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    
-    <!-- Babel Standalone: This allows the browser to transpile .tsx files in real-time -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest"></script>
+
     <script>
-      // 1. Shim process.env immediately to prevent ReferenceErrors
-      window.process = { env: { API_KEY: '' } };
-
-      // 2. Comprehensive error tracker
-      function showError(msg, details = "") {
-        console.error("FATAL_ERROR:", msg, details);
-        const root = document.getElementById('root');
-        if (root) {
-          root.innerHTML = `
-            <div style="padding:40px; color:#ff4444; font-family:monospace; background:#020617; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-              <h2 style="font-family:Orbitron; color:#06b6d4; margin-bottom:20px;">SYSTEM BOOT FAILURE</h2>
-              <div style="border:1px solid #333; padding:20px; background:#0f172a; border-radius:8px; max-width:600px; width:100%;">
-                <p style="margin:0 0 10px 0; color:#ef4444;">${msg}</p>
-                ${details ? `<p style="font-size:12px; opacity:0.5; margin:0;">${details}</p>` : ''}
-                <p style="font-size:11px; margin-top:20px; color:#06b6d4;">Browsers cannot run .tsx files natively. We are using a client-side transpiler to bypass MIME type restrictions on GitHub Pages.</p>
-              </div>
-              <button onclick="location.reload()" style="margin-top:30px; padding:10px 20px; background:#06b6d4; color:black; border:none; cursor:pointer; font-family:Orbitron; border-radius:4px;">RETRY INITIALIZATION</button>
-            </div>`;
-        }
-      }
-
-      window.onerror = function(message, source, lineno, colno, error) {
-        showError(message, `Source: ${source || 'unknown'}:${lineno || '?'}`);
-      };
-
       tailwind.config = {
         theme: {
           extend: {
@@ -62,52 +39,277 @@
         },
       }
     </script>
+
     <style>
       body { background-color: #020617; color: #fff; margin: 0; overflow-x: hidden; }
-      #root:empty::before {
-        content: 'THE ETERNAL VOW 2026 INITIALIZING...';
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-family: 'Orbitron', sans-serif;
-        letter-spacing: 0.5em;
-        color: #06b6d4;
-        animation: blink 2s infinite;
-        white-space: nowrap;
-      }
-      @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+      /* Custom scrollbar for builder */
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #0f172a; }
+      ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
-    
-    <script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "@google/genai": "https://esm.sh/@google/genai@1.40.0",
-    "lucide-react": "https://esm.sh/lucide-react@0.463.0?external=react,react-dom",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "vite": "https://esm.sh/vite@^7.3.1",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.4"
-  }
-}
-</script>
 </head>
 <body>
     <div id="root"></div>
-    
-    <!-- 
-      By using type="text/babel" and data-type="module", Babel Standalone 
-      will fetch the .tsx file, transpile it into JavaScript, and execute 
-      it as a module. This completely bypasses the GitHub Pages MIME type error.
-    -->
-    <script 
-      type="text/babel" 
-      data-type="module" 
-      data-presets="react,typescript" 
-      src="./index.tsx"
-    ></script>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+      
+      // --- ICONS (Lucide React Wrapper) ---
+      // Since we are using CDN, we need to get icons from the global 'lucide' object or create simple wrappers
+      // For simplicity in this standalone version, we will use a helper to render icons or just text if icons fail.
+      // NOTE: In a real CDN React env, accessing lucide-react can be tricky. 
+      // We will define a simple Icon component that tries to find the icon in the global scope.
+      
+      const Icon = ({ name, className, ...props }) => {
+        // In a standalone build, Lucide icons might be available globally via `lucide.icons`
+        // or we can just render SVGs if we had them. 
+        // For this quick fix, we will rely on lucide-react being loaded or fallback to text.
+        try {
+            const LucideIcons = window.LucideReact || window.lucide; 
+            if (LucideIcons && LucideIcons[name]) {
+                const IconComponent = LucideIcons[name];
+                return <IconComponent className={className} {...props} />;
+            }
+        } catch (e) {}
+        
+        // Fallback SVG renderers for critical icons to ensure it looks good immediately
+        if (name === 'Sparkles') return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
+        if (name === 'Heart') return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>;
+        if (name === 'MapPin') return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
+        
+        return <span className={className}>{name}</span>;
+      };
+
+      // --- MOCK SERVICES ---
+      const generateLoveStory = async (p1, p2, points) => {
+         return new Promise(resolve => {
+            setTimeout(() => {
+                resolve(`In the year 2026, amidst the neon glow of the digital frontier, ${p1} and ${p2} found a connection that defied the algorithm. ${points}. Their union is now written in the stars.`);
+            }, 1500);
+         });
+      };
+
+      // --- TYPES & DATA ---
+      const initialData = {
+        partner1: "Omar",
+        partner2: "Laila",
+        date: "2026-06-15",
+        location: "Cairo Opera House - Grand Ballroom",
+        venueName: "The Royal Pavilion",
+        storyPoints: "We met under the stars of the Nile. Our first journey was a desert sunrise.",
+        storyNarrative: "Across dunes of time and rivers of fate, Omar and Laila's paths merged into a single horizon. A love that echoes in the sands of eternity.",
+        themeColor: "cyan",
+        theme: 'cyberpunk',
+        maxGuests: 2,
+        stats: { daysTogether: 1500, milesTraveled: 12000, coffeesShared: 2400 },
+        schedule: [
+          { time: "18:00", event: "Welcome Reception", description: "Arrival of guests at the main gate.", icon: "cocktail" },
+          { time: "19:30", event: "Zaffa & Ceremony", description: "Traditional entrance and vows.", icon: "heart" },
+          { time: "21:00", event: "Gala Dinner", description: "Royal banquet served.", icon: "utensils" },
+          { time: "23:00", event: "Celestial Celebration", description: "Dancing under the moonlight.", icon: "music" },
+        ]
+      };
+
+      // --- COMPONENT: BUILDER ---
+      const Builder = ({ data, onUpdate, onLaunch }) => {
+        const [isGenerating, setIsGenerating] = useState(false);
+
+        const handleChange = (field, value) => {
+          onUpdate({ ...data, [field]: value });
+        };
+        
+        const handleStatChange = (stat, value) => {
+           onUpdate({ ...data, stats: { ...data.stats, [stat]: value } });
+        };
+
+        const handleScheduleChange = (index, field, value) => {
+          const newSchedule = [...data.schedule];
+          newSchedule[index] = { ...newSchedule[index], [field]: value };
+          handleChange('schedule', newSchedule);
+        };
+        
+        const removeScheduleItem = (index) => {
+            const newSchedule = data.schedule.filter((_, i) => i !== index);
+            handleChange('schedule', newSchedule);
+        };
+        
+        const addScheduleItem = () => {
+             const newItem = { time: '', event: '', description: '', icon: 'circle' };
+             handleChange('schedule', [...data.schedule, newItem]);
+        };
+
+        const handleGenerateStory = async () => {
+            setIsGenerating(true);
+            const story = await generateLoveStory(data.partner1, data.partner2, data.storyPoints);
+            handleChange('storyNarrative', story);
+            setIsGenerating(false);
+        };
+
+        const s = {
+             // Simplified theme logic for the single file version
+             wrapper: data.theme === 'minimalist' ? 'bg-white text-black' : data.theme === 'ethereal' ? 'bg-[#f5f5f4] text-stone-800' : 'bg-slate-900 text-white',
+             panel: data.theme === 'minimalist' ? 'bg-white border-2 border-black' : data.theme === 'ethereal' ? 'bg-white/80 border border-stone-200' : 'bg-slate-900/60 border border-slate-700',
+             input: data.theme === 'minimalist' ? 'bg-white border-2 border-black text-black' : data.theme === 'ethereal' ? 'bg-white border border-stone-300 text-stone-800' : 'bg-slate-800 border border-slate-600 text-white',
+             buttonPrimary: data.theme === 'minimalist' ? 'bg-black text-white border-2 border-black' : data.theme === 'ethereal' ? 'bg-emerald-600 text-white' : 'bg-cyan-500 text-slate-900',
+        };
+
+        return (
+          <div className={`min-h-screen ${s.wrapper} p-6 md:p-12 overflow-y-auto`}>
+            <div className="max-w-4xl mx-auto space-y-8 pb-20">
+              <header className="flex items-center gap-3">
+                 <Icon name="Sparkles" className="h-6 w-6" />
+                 <h1 className="text-4xl font-display font-bold">Vow.AI Builder</h1>
+              </header>
+
+              <div className={`${s.panel} p-6 rounded-2xl space-y-6`}>
+                 <h2 className="text-xl font-semibold">Visual Theme</h2>
+                 <div className="grid grid-cols-3 gap-4">
+                    {['cyberpunk', 'ethereal', 'minimalist'].map(t => (
+                        <button key={t} onClick={() => handleChange('theme', t)} className={`p-4 text-left border ${data.theme === t ? 'border-cyan-500 ring-1 ring-cyan-500' : 'border-gray-500'}`}>
+                            <span className="capitalize font-bold">{t}</span>
+                        </button>
+                    ))}
+                 </div>
+              </div>
+
+              <div className={`${s.panel} p-6 rounded-2xl space-y-6`}>
+                 <h2 className="text-xl font-semibold">The Couple</h2>
+                 <div className="grid grid-cols-2 gap-4">
+                    <input type="text" value={data.partner1} onChange={e => handleChange('partner1', e.target.value)} className={`w-full p-3 ${s.input}`} placeholder="Partner 1" />
+                    <input type="text" value={data.partner2} onChange={e => handleChange('partner2', e.target.value)} className={`w-full p-3 ${s.input}`} placeholder="Partner 2" />
+                 </div>
+              </div>
+              
+              <div className={`${s.panel} p-6 rounded-2xl space-y-6`}>
+                 <h2 className="text-xl font-semibold">Logistics</h2>
+                 <input type="date" value={data.date} onChange={e => handleChange('date', e.target.value)} className={`w-full p-3 ${s.input}`} />
+                 <input type="text" value={data.venueName} onChange={e => handleChange('venueName', e.target.value)} className={`w-full p-3 ${s.input}`} placeholder="Venue Name" />
+              </div>
+              
+              <div className={`${s.panel} p-6 rounded-2xl space-y-6`}>
+                 <h2 className="text-xl font-semibold">Story</h2>
+                 <textarea value={data.storyPoints} onChange={e => handleChange('storyPoints', e.target.value)} className={`w-full p-3 h-24 ${s.input}`} placeholder="Story points..." />
+                 <button onClick={handleGenerateStory} disabled={isGenerating} className={`px-6 py-2 rounded ${s.buttonPrimary}`}>
+                    {isGenerating ? 'Generating...' : 'Generate Narrative'}
+                 </button>
+                 <textarea value={data.storyNarrative} onChange={e => handleChange('storyNarrative', e.target.value)} className={`w-full p-3 h-32 ${s.input}`} />
+              </div>
+            </div>
+            
+            <div className="fixed bottom-0 left-0 right-0 p-4 backdrop-blur-lg border-t border-slate-700 flex justify-end">
+                <button onClick={onLaunch} className={`${s.buttonPrimary} px-8 py-3 rounded font-bold flex items-center gap-2`}>
+                    Launch Invitation <Icon name="ArrowRight" className="h-4 w-4" />
+                </button>
+            </div>
+          </div>
+        );
+      };
+
+      // --- COMPONENT: GUEST VIEW ---
+      const GuestView = ({ data, onEdit }) => {
+         const [isOpened, setIsOpened] = useState(false);
+         const [showRSVPSuccess, setShowRSVPSuccess] = useState(false);
+         
+         const themes = {
+            cyberpunk: { bg: 'bg-[#020617]', text: 'text-white', accent: 'text-cyan-400', button: 'bg-white text-black' },
+            ethereal: { bg: 'bg-[#fafaf9]', text: 'text-stone-800', accent: 'text-emerald-600', button: 'bg-emerald-700 text-white' },
+            minimalist: { bg: 'bg-white', text: 'text-black', accent: 'text-black', button: 'bg-black text-white' }
+         };
+         
+         const t = themes[data.theme];
+
+         const handleOpen = () => setIsOpened(true);
+         const handleRSVP = () => { setShowRSVPSuccess(true); setTimeout(() => setShowRSVPSuccess(false), 3000); };
+
+         if (!isOpened) {
+            return (
+                <div className={`fixed inset-0 z-50 flex items-center justify-center p-6 ${t.bg} ${t.text}`}>
+                    <div className="text-center space-y-8 animate-pulse">
+                        <h2 className="text-4xl font-bold uppercase tracking-widest">{data.partner1} & {data.partner2}</h2>
+                        <button onClick={handleOpen} className={`px-12 py-4 font-bold uppercase tracking-widest ${t.button}`}>
+                            Enter Experience
+                        </button>
+                    </div>
+                </div>
+            );
+         }
+
+         return (
+            <div className={`min-h-screen ${t.bg} ${t.text} font-sans pb-20`}>
+                {showRSVPSuccess && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur">
+                        <div className="bg-slate-900 p-8 border border-cyan-500 rounded-xl text-center">
+                            <Icon name="Sparkles" className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
+                            <h3 className="text-2xl text-white font-bold uppercase">Access Granted</h3>
+                            <p className="text-slate-400 mt-2">RSVP Confirmed for {data.date}</p>
+                        </div>
+                    </div>
+                )}
+            
+                <nav className="fixed top-0 w-full p-6 flex justify-between items-center z-40 backdrop-blur-sm">
+                    <div className="font-bold tracking-wider">{data.partner1} & {data.partner2}</div>
+                    <button onClick={onEdit} className="text-xs uppercase opacity-50 hover:opacity-100">Edit Suite</button>
+                </nav>
+
+                <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-20">
+                    <h1 className="text-6xl md:text-8xl font-display font-black leading-none uppercase mb-8">
+                        <span className={t.accent}>{data.partner1}</span><br/>
+                        <span className="text-4xl opacity-30">&</span><br/>
+                        <span className={t.accent}>{data.partner2}</span>
+                    </h1>
+                    <div className="flex gap-6 text-xl opacity-80">
+                        <div className="flex items-center gap-2"><Icon name="Calendar" className="h-5 w-5" /> {data.date}</div>
+                        <div className="flex items-center gap-2"><Icon name="MapPin" className="h-5 w-5" /> {data.venueName}</div>
+                    </div>
+                </section>
+
+                <section className="py-20 px-6 max-w-4xl mx-auto text-center">
+                    <p className="text-2xl md:text-3xl font-serif italic leading-relaxed opacity-90">{data.storyNarrative}</p>
+                </section>
+
+                <section className="py-20 px-6 max-w-3xl mx-auto space-y-12">
+                    <h2 className="text-2xl font-bold uppercase tracking-widest border-l-4 border-current pl-4">Timeline</h2>
+                    <div className="space-y-8">
+                        {data.schedule.map((item, i) => (
+                            <div key={i} className="flex gap-6">
+                                <div className="w-16 font-mono opacity-60 pt-1">{item.time}</div>
+                                <div>
+                                    <h4 className="text-xl font-bold">{item.event}</h4>
+                                    <p className="opacity-60">{item.description}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+                
+                <section className="py-20 px-6 max-w-xl mx-auto">
+                    <button onClick={handleRSVP} className={`w-full py-6 font-bold uppercase tracking-widest text-xl rounded-xl shadow-lg ${t.button}`}>
+                        Confirm Presence
+                    </button>
+                </section>
+            </div>
+         );
+      };
+
+      // --- APP ROOT ---
+      const App = () => {
+        const [mode, setMode] = useState('BUILDER');
+        const [data, setData] = useState(initialData);
+
+        return (
+          <div className="antialiased">
+            {mode === 'BUILDER' ? (
+              <Builder data={data} onUpdate={setData} onLaunch={() => setMode('PREVIEW')} />
+            ) : (
+              <GuestView data={data} onEdit={() => setMode('BUILDER')} />
+            )}
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
 </body>
 </html>
