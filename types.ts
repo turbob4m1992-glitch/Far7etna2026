@@ -30,7 +30,4 @@ export interface ChatMessage {
   timestamp: number;
 }
 
-export enum AppMode {
-  BUILDER = 'BUILDER',
-  PREVIEW = 'PREVIEW',
-}
+export type AppMode = 'BUILDER' | 'PREVIEW';
