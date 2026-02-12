@@ -7,8 +7,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script>
-      // Shim process.env to prevent ReferenceErrors in the browser
+      // 1. Shim process.env immediately to prevent ReferenceErrors
       window.process = { env: { API_KEY: '' } };
+
+      // 2. Global error tracker for debugging deployment issues
+      window.onerror = function(message, source, lineno, colno, error) {
+        console.error("App Crash Details:", { message, source, lineno, colno, error });
+        const root = document.getElementById('root');
+        if (root && root.innerHTML === "") {
+          root.innerHTML = `<div style="padding:20px; color:#ff4444; font-family:monospace; background:#111; border:1px solid red; margin:20px; border-radius:8px;">
+            <h3>System Boot Error</h3>
+            <p>${message}</p>
+            <p style="font-size:12px; opacity:0.7">Source: ${source}:${lineno}</p>
+          </div>`;
+        }
+      };
       
       tailwind.config = {
         theme: {
@@ -35,7 +48,7 @@
     <style>
       body { background-color: #020617; color: #fff; margin: 0; }
       #root:empty::before {
-        content: 'INITIALIZING SYSTEMS...';
+        content: 'BOOTING AI WEDDING SUITE...';
         position: fixed;
         top: 50%;
         left: 50%;
@@ -43,9 +56,9 @@
         font-family: 'Orbitron', sans-serif;
         letter-spacing: 0.5em;
         color: #06b6d4;
-        animation: pulse 2s infinite;
+        animation: blink 2s infinite;
       }
-      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+      @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
     </style>
     <script type="importmap">
 {
@@ -55,14 +68,14 @@
     "react-dom/client": "https://esm.sh/react-dom@19.2.4/client",
     "@google/genai": "https://esm.sh/@google/genai@1.40.0",
     "lucide-react": "https://esm.sh/lucide-react@0.463.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/"
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
   }
 }
 </script>
 </head>
 <body>
     <div id="root"></div>
-    <script type="module" src="index.tsx"></script>
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>
