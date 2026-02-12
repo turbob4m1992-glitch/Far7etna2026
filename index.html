@@ -7,19 +7,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script>
-      // 1. Shim process.env immediately to prevent ReferenceErrors
+      // 1. Shim process.env immediately to prevent ReferenceErrors in modules
       window.process = { env: { API_KEY: '' } };
 
-      // 2. Global error tracker for debugging deployment issues
+      // 2. Comprehensive error tracker
       window.onerror = function(message, source, lineno, colno, error) {
-        console.error("App Crash Details:", { message, source, lineno, colno, error });
+        console.error("BOOT_CRASH:", { message, source, lineno, colno, error });
         const root = document.getElementById('root');
-        if (root && root.innerHTML === "") {
-          root.innerHTML = `<div style="padding:20px; color:#ff4444; font-family:monospace; background:#111; border:1px solid red; margin:20px; border-radius:8px;">
-            <h3>System Boot Error</h3>
-            <p>${message}</p>
-            <p style="font-size:12px; opacity:0.7">Source: ${source}:${lineno}</p>
-          </div>`;
+        if (root) {
+          root.innerHTML = `
+            <div style="padding:40px; color:#ff4444; font-family:monospace; background:#020617; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+              <h2 style="font-family:Orbitron; color:#06b6d4; margin-bottom:20px;">SYSTEM BOOT FAILURE</h2>
+              <div style="border:1px solid #333; padding:20px; background:#0f172a; border-radius:8px; max-width:600px; width:100%;">
+                <p style="margin:0 0 10px 0; color:#ef4444;">${message}</p>
+                <p style="font-size:12px; opacity:0.5; margin:0;">Source: ${source || 'unknown'}:${lineno || '?'}</p>
+                <p style="font-size:11px; margin-top:20px; color:#06b6d4;">Check the browser console for more details.</p>
+              </div>
+              <button onclick="location.reload()" style="margin-top:30px; padding:10px 20px; background:#06b6d4; color:black; border:none; cursor:pointer; font-family:Orbitron;">RETRY INITIALIZATION</button>
+            </div>`;
         }
       };
       
@@ -46,7 +51,7 @@
       }
     </script>
     <style>
-      body { background-color: #020617; color: #fff; margin: 0; }
+      body { background-color: #020617; color: #fff; margin: 0; overflow-x: hidden; }
       #root:empty::before {
         content: 'BOOTING AI WEDDING SUITE...';
         position: fixed;
@@ -57,6 +62,7 @@
         letter-spacing: 0.5em;
         color: #06b6d4;
         animation: blink 2s infinite;
+        white-space: nowrap;
       }
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
     </style>
@@ -68,8 +74,8 @@
     "react-dom/client": "https://esm.sh/react-dom@19.2.4/client",
     "@google/genai": "https://esm.sh/@google/genai@1.40.0",
     "lucide-react": "https://esm.sh/lucide-react@0.463.0",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
   }
 }
 </script>

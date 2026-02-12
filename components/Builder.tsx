@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { InvitationData, ScheduleItem } from '../types';
+import { InvitationData, ScheduleItem } from '../types.ts';
 import { Sparkles, Save, Wand2, Calendar, MapPin, Heart, Clock, Trash2, Plus, Palette, Users, ArrowRight } from 'lucide-react';
-import { generateLoveStory } from '../services/gemini';
+import { generateLoveStory } from '../services/gemini.ts';
 
 interface BuilderProps {
   data: InvitationData;
@@ -48,7 +48,6 @@ const Builder: React.FC<BuilderProps> = ({ data, onUpdate, onLaunch }) => {
     handleChange('schedule', newSchedule);
   };
 
-  // --- Dynamic Theme Styles for Builder UI ---
   const getThemeStyles = () => {
     switch (data.theme) {
       case 'ethereal':
@@ -121,7 +120,6 @@ const Builder: React.FC<BuilderProps> = ({ data, onUpdate, onLaunch }) => {
           <p className={s.subHeader}>Design your futuristic experience.</p>
         </header>
 
-        {/* Section: Visual Theme Selection (Moved to top for immediate impact) */}
         <div className={`${s.panel} p-6 rounded-2xl space-y-6 transition-all duration-300`}>
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Palette className={s.icon} /> Visual Theme
@@ -148,7 +146,6 @@ const Builder: React.FC<BuilderProps> = ({ data, onUpdate, onLaunch }) => {
           </div>
         </div>
 
-        {/* Section 1: The Couple */}
         <div className={`${s.panel} p-6 rounded-2xl space-y-6 transition-all duration-300`}>
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Heart className={`text-pink-500`} /> The Couple
@@ -175,7 +172,6 @@ const Builder: React.FC<BuilderProps> = ({ data, onUpdate, onLaunch }) => {
           </div>
         </div>
 
-        {/* Section 2: Logistics */}
         <div className={`${s.panel} p-6 rounded-2xl space-y-6 transition-all duration-300`}>
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <MapPin className={s.icon} /> Logistics
@@ -227,7 +223,6 @@ const Builder: React.FC<BuilderProps> = ({ data, onUpdate, onLaunch }) => {
           </div>
         </div>
 
-         {/* Section 3: Schedule Builder */}
          <div className={`${s.panel} p-6 rounded-2xl space-y-6 transition-all duration-300`}>
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Clock className={`text-yellow-500`} /> Mission Timeline (Schedule)
@@ -285,7 +280,6 @@ const Builder: React.FC<BuilderProps> = ({ data, onUpdate, onLaunch }) => {
           </div>
         </div>
 
-        {/* Section 4: Story & AI */}
         <div className={`${s.panel} p-6 rounded-2xl space-y-6 transition-all duration-300`}>
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Wand2 className={`text-purple-500`} /> AI Story Generator
@@ -319,7 +313,6 @@ const Builder: React.FC<BuilderProps> = ({ data, onUpdate, onLaunch }) => {
           </div>
         </div>
 
-        {/* Section 5: Statistics */}
         <div className={`${s.panel} p-6 rounded-2xl space-y-6 transition-all duration-300`}>
           <h2 className="text-xl font-semibold">Relationship Stats (Optional)</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -358,7 +351,6 @@ const Builder: React.FC<BuilderProps> = ({ data, onUpdate, onLaunch }) => {
 
       </div>
 
-      {/* Sticky Footer */}
       <div className={`fixed bottom-0 left-0 right-0 p-4 backdrop-blur-lg border-t flex justify-end gap-4 z-50 ${data.theme === 'minimalist' ? 'bg-white/90 border-black' : data.theme === 'ethereal' ? 'bg-[#fafaf9]/90 border-stone-200' : 'bg-slate-900/90 border-slate-700'}`}>
         <button 
            onClick={onLaunch}

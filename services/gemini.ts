@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { InvitationData } from "../types";
+import { InvitationData } from "../types.ts";
 
 const getAI = () => {
     if (!process.env.API_KEY) {
@@ -42,7 +42,6 @@ export const getConciergeResponse = async (
   try {
     const ai = getAI();
     
-    // Construct system context
     const context = `
       You are "AURA", the AI Wedding Concierge for ${data.partner1} and ${data.partner2}.
       Wedding Date: ${data.date}.
@@ -54,10 +53,6 @@ export const getConciergeResponse = async (
       Keep it futuristic and classy.
     `;
 
-    // Transform simple history to Content format if needed, but for simple QA 
-    // we can just append previous turns or rely on a fresh prompt with context for simplicity in this demo.
-    // For better results in a real app, we'd use the Chat API. Here we'll use generateContent with context.
-    
     const prompt = `
       ${context}
       
